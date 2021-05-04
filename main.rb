@@ -23,6 +23,7 @@
         6. One-liners
 
 =end 
+#require "colorize"
 require "tty-prompt"
 prompt = TTY::Prompt.new
 class NewPassword
@@ -31,14 +32,6 @@ class NewPassword
     def initialize(length, strength)
         @length = length
         @strength = strength
-    end
-
-    def length_password
-        puts "how long do you want the new password to be?"
-    end
-
-    def strength_password
-        puts "what level of strength are you looking for? (weak, intermediate or strong)"
     end
 
     def password_generator 
@@ -80,7 +73,7 @@ class NewPassword
             # strong
                 # contains letters, numbs and symbols
                 # they all come from random order
-        if strength[0]
+        if strength == "weak"
             # creates division between the  how many letters and numbers
             #wasnt working before now it
             if new_length % 2 == 0
@@ -104,7 +97,7 @@ class NewPassword
                 new_password = new_password + nums.sample
                 number_half = number_half - 1
             end
-        elsif strength[1]
+        elsif strength == "intermediate"
             # has lower case, upper case, numebrs then 1 symbol
             # minus 1 for the symbol , as it is constant
             # so division between 2 half of it is number and letters (inside letter divsion between 2 numbers and letters)
@@ -135,7 +128,7 @@ class NewPassword
                 number_half = number_half - 1
             end
             new_password = new_password + symbols.sample
-        elsif strength[2]
+        elsif strength == "strong"
             # strong
             # strong is a random combination of letters, numbers, symbs and uppercase 
             # array allows a random slector of combination picker, alowing randmisation combination of symbols, letters and numbers
@@ -154,7 +147,6 @@ class NewPassword
                 new_length = new_length - 1
             end
         end
-
         puts new_password
         
     end
@@ -166,30 +158,39 @@ class ExistingPassword
 
     def initialize(password)
         @password = password
+        @symbols_counter = 0 
+        @upper_counter = 0 
+        @lower_counter = 0
+        @nums_counter = 0
+    end
+    # fix everything below that 
+    def password_generator
+        password.split(" ")
+        return x
+        # password_string.each.to_char { |char|
+        #     if char == ("A"..."Z")
+        #         @upper_counter += 1
+        #     elsif char == ("a"..."z")
+        #         @lower_counter += 1
+        #     elsif char == ("1"..."9")
+        #         @nums_counter += 1
+        #     else 
+        #         @symbols_counter += 1  
+        #     end
+        # }
+        # if @upper_counter >= 1 && @lower_counter >= 1 && @nums_counter >= 1 && @symbols_counter >= 1
+        #     puts "this password is strong"
+        # elsif @upper_counter == 0 && @symbols_counter == 0 
+        #     puts "this password is weak"
+        # elsif @symbols_counter <= 1 
+        #     puts "this password is intermediate"
+        # else 
+        #     puts "cant compute"
+        # end
     end
 
-    def password_generator 
-        #password_length_integer = password.length
-        for char in password.to_s!
-            if char == ("A"..."Z")
-                upper_counter += 1
-            elsif char == ("a"..."z")
-                lower_counter += 1
-            elsif charr == ("1"..."9")
-                nums_counter += 1
-            else 
-                symbols_counter += 1
-            end
-        end
-        if upper_counter >= 1 && lower_counter >= 1 && nums_counter >= 1 && symbols_counter >= 1
-            puts "this password is strong"
-        elsif upper_counter == 0 && symbols_counter == 0 
-            puts "this password is weak"
-        elsif symbols_counter <= 1 
-            puts "this passowrd is intermediate"
-        else 
-            puts "cant compute"
-        end
+    def another_method
+        result = password_generator
     end
 
 end
@@ -199,8 +200,8 @@ end
 
 puts "Hello! Welcome to the Code Reviewer/Generator 3000"
 puts "Lets begin! What would you like to do?"
-choices = %w(new_password existing_password)
-question_choice = prompt.multi_select("What do you wanna do?", choices)
+
+choices = prompt.select("What do you wanna do?", %w(new_password existing_password))
 # puts "Do you want to genrator a password or see strength of existing password? (type in new or existing)"
 # genarate_or_password = gets.chomp
 # genarate_or_password.downcase!
@@ -226,18 +227,16 @@ end
 # trying out teneray operators 
 #puts genarate_or_password == "new" ? "Great Choice lets make a new password for you" : "Greate chocie lets review your existing password"
 puts choices.inspect 
-
-if choices[0]
+if choices == "new_password"
     #genarate_or_password = NewPassword.new()
     #genarate_or_password.length_password
     puts "how long do you want the password to be?"
     # why did i use gets.chomp vs gets line 80 stregnth == "weak\n"
-    genarate_or_password_legnth = prompt.slider("Password Length", min: 0, max: 30, step:5)
+    genarate_or_password_legnth = prompt.slider("Password Length: ", min: 0, max: 30, step:1)
     #genarate_or_password.strength_password
-    choices = %w(weak intermediate strong)
-    genarate_or_password_strength = prompt.multi_select("What level of strength are you looking for?", choices)
-    genarate_or_password = NewPassword.new(genarate_or_password_legnth,choices)
-else choices[1]
+    genarate_or_password_strength = prompt.select("What level of strength are you looking for?", %w(weak intermediate strong))
+    genarate_or_password = NewPassword.new(genarate_or_password_legnth,genarate_or_password_strength)
+elsif choices == "existing_password"
     puts "Type in the password:"
     password = gets.chomp
     genarate_or_password = ExistingPassword.new(password)
@@ -245,6 +244,7 @@ end
 
 puts "Your new password is:"
 genarate_or_password.password_generator
+puts genarate_or_password.password
 
 
 
